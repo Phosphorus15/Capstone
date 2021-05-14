@@ -11198,7 +11198,7 @@ static const uint8_t DecoderTablev8NEON32[] = {
 static bool checkDecoderPredicate(unsigned Idx, MCInst *MI)
 {
   switch (Idx) {
-  default: /* llvm_unreachable("Invalid index!");*/ 
+  default: /* llvm_unreachable("Invalid index!");*/
   case 0:
     return (!ARM_getFeatureBits(MI->csh->mode, ARM_ModeThumb));
   case 1:

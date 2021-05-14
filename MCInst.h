@@ -141,4 +141,6 @@ unsigned MCInst_getNumOperands(const MCInst *inst);
 // This addOperand2 function doesnt free Op
 void MCInst_addOperand2(MCInst *inst, MCOperand *Op);
 
+#include "MCInstPrinter.h"
+
 #endif
