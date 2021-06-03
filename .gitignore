@@ -127,3 +127,6 @@ cstool/cstool
 
 # android
 android-ndk-*
+
+# cmake
+cmake-build-debug

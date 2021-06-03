@@ -5,6 +5,10 @@
 #ifndef CAPSTONE_MCINSTPRINTER_H
 #define CAPSTONE_MCINSTPRINTER_H
 
+#include "MCInst.h"
+#include "capstone/platform.h"
+#include "stdlib.h"
+
 typedef enum CondKind {
   AliasPatternCond_K_Feature,	    // Match only if a feature is enabled.
   AliasPatternCond_K_NegFeature,    // Match only if a feature is disabled.

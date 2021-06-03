@@ -96,7 +96,7 @@ const char *MCInstPrinter_matchAliasPatterns(
     bool fallThrough = true;
     for (unsigned j = Pattern.AliasCondStart;
 	 j < Pattern.AliasCondStart + Pattern.NumConds; j++) {
-      fallThrough |= MCInstPrinter_matchAliasCondition(
+      fallThrough &= MCInstPrinter_matchAliasCondition(
 	  MI, &OpIdx, OpToPatterns, Patterns, Conds, &Conds[j],
 	  &OrPredicateResult);
       if (!fallThrough)

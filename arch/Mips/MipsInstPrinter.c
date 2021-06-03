@@ -89,6 +89,8 @@ static void printMemOperandEA(MCInst *MI, int opNum, SStream *O);
 static void printFCCOperand(MCInst *MI, int opNum, SStream *O);
 static void printRegisterList(MCInst *MI, int opNum, SStream *O);
 
+#include "../MCInstPrinter.h"
+
 #define GET_INSTRINFO_ENUM
 #define GET_REGINFO_ENUM
 #define GET_ASM_WRITER

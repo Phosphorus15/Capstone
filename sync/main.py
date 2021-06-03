@@ -6,7 +6,7 @@ import re
 # NOTE : unfortunately not all of the disassembler details are recorded in llvm *.td file
 # this script is for dumping those codes into our project
 
-arch = "Mips"  # TODO
+arch = "ARM"  # TODO
 
 f = open(sys.argv[1])
 lines = f.readlines()
@@ -14,6 +14,12 @@ f.close()
 
 buffer = []
 read_depth = 0
+
+thumb_mode = False
+
+
+def is_arm():
+    return arch == "ARM" or arch == "AArch64"
 
 
 def join(x, y):
@@ -28,6 +34,12 @@ def create_reg_decode_def(func):
     output = output.replace("InsnType", "unsigned")  # replace all for InsnType is fine
     output = output.replace("const void", "MCRegisterInfo", 1)
 
+    print(output)
+
+
+def create_reg_const(func):
+    output = functools.reduce(join, func)
+    output = output.replace("::", "_")
     print(output)
 
 
@@ -51,11 +63,28 @@ def create_reg_decode(func):
     )
     output = output.replace("DecodeFN RegDecoder = 0x0;", "RegDecoder = 0x0;")
 
-    # a unfortunate path to MIPS
+    # a unfortunate patch to MIPS
 
     output = output.replace(
         "Inst.getOperand(2).getImm()", "MCOperand_getImm(MCInst_getOperand(Inst, 2))"
     )
+
+    # unfortunate patch to ARM & AArch64
+
+    if is_arm():
+        output = output.replace(
+            "fieldFromInstruction",
+            "fieldFromInstruction_" + ("2" if thumb_mode else "4"),
+        )
+    output = output.replace("Check(S", "Check(&S")
+    output = output.replace("Check(DS", "Check(&DS")
+    output = re.sub(
+        r"const FeatureBitset &[fF]eatureBits =.+?;",
+        "/* Ignored bit flags */",
+        output,
+        flags=re.S,
+    )
+    output = re.sub(r"[fF]eatureBits\[.+?]", "true", output)
 
     # here goes the common procedure (not patch)
     # namespace replacement
@@ -126,7 +155,10 @@ def create_reg_decode(func):
                     depth += 1
             params = output[pos + len(line_str) : end]
             template = re.findall(r"<(.+?)>", output)
-            output = output[0:pos] + "(" + params + ", " + template[0] + output[end:-1]
+            output = output[0:pos] + "(" + params + ", " + template[0] + output[end:]
+
+    # `::` are never valid in C, we'd remove it whenever possible
+    output = output.replace("::", "_")
 
     print(output)
 
@@ -135,10 +167,15 @@ def create_reg_decode(func):
 print("static void llvm_unreachable(const char * info) {}")
 print("static void assert(int val) {}")
 
+const_table = False
+
+
 for line in lines:
     if re.match(r"static DecodeStatus", line):
-        if "readInstruction" in line:
+        if "readInstruction" in line or "checkDecodedInstruction" in line:
             continue
+        if "Thumb" in line and is_arm():
+            thumb_mode = True
         buffer.append(line)
         if ";" in line:  # let go of the function declaration
             create_reg_decode_def(buffer)
@@ -149,6 +186,15 @@ for line in lines:
         else:
             read_depth = 1
         continue
+    if "static const uint16_t" in line:
+        if read_depth < 1:
+            buffer.append(line)
+            const_table = 0
+            if "{" in line:
+                read_depth = 2
+            else:
+                read_depth = 1
+            continue
     if (
         ";" in line and read_depth <= 1 and len(buffer) > 0
     ):  # lazy detection of function definitions
@@ -157,9 +203,12 @@ for line in lines:
         buffer.clear()
         read_depth = 0
         continue
+    if is_arm() and read_depth == 1:
+        if "Thumb" in line:
+            thumb_mode = True
     if "{" in line and read_depth >= 1:
         buffer.append(line)
-        if not "}" in line:
+        if "}" not in line:
             read_depth += 1
         continue
     if read_depth >= 1:
@@ -167,6 +216,10 @@ for line in lines:
         if "}" in line:
             read_depth -= 1
             if read_depth <= 1:
-                create_reg_decode(buffer)
+                if const_table:
+                    create_reg_const(buffer)
+                else:
+                    create_reg_decode(buffer)
                 read_depth = 0
+                thumb_mode = False
                 buffer.clear()

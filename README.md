@@ -1,75 +1,83 @@
-Capstone Engine
+Capstone Syncing
 ===============
 
-[![Build Status](https://travis-ci.org/aquynh/capstone.svg?branch=next)](https://travis-ci.org/aquynh/capstone)
-[![Build status](https://ci.appveyor.com/api/projects/status/a4wvbn89wu3pinas/branch/next?svg=true)](https://ci.appveyor.com/project/aquynh/capstone/branch/next)
-[![pypi package](https://badge.fury.io/py/capstone.svg)](https://pypi.python.org/pypi/capstone)
-[![pypi downloads](https://pepy.tech/badge/capstone)](https://pepy.tech/project/capstone)
-[![Fuzzit Status](https://app.fuzzit.dev/badge?org_id=ANOh0D48gSLBxNZcDQMI&branch=master)](https://app.fuzzit.dev/admin/ANOh0D48gSLBxNZcDQMI/dashboard)<br/>
+This document describes the use of syncing tools and
+used as a tracking file for sync progress.
 
-Capstone is a disassembly framework with the target of becoming the ultimate
-disasm engine for binary analysis and reversing in the security community.
+## How to adapt an architecture with auto-sync
 
-Created by Nguyen Anh Quynh, then developed and maintained by a small community,
-Capstone offers some unparalleled features:
+0. Get a copy of llvm-project source (or all it's architecture files)
 
-- Support multiple hardware architectures: ARM, ARM64 (ARMv8), BPF, Ethereum VM, Webassembly, 
-  M68K, Mips, MOS65XX, PPC, Sparc, SystemZ, TMS320C64X, M680X, XCore, RISC-V(rv32G/rv64G) 
-  and X86 (including X86_64).
+1. Pull the modified llvm-tblgen backend
 
-- Having clean/simple/lightweight/intuitive architecture-neutral API.
+2. Build the modified backend with target `llvm-tblgen`
+```shell
+cmake --build ./llvm-project/build --target llvm-tblgen --config Release
+```
 
-- Provide details on disassembled instruction (called “decomposer” by others).
+3. Select the architecture from llvm as ARCH
+```shell
+export $ARCH=Mips
+```
 
-- Provide semantics of the disassembled instruction, such as list of implicit
-  registers read & written.
+4. Use `llvm-tblgen` binary to generate the disassembler
+```shell
+llvm-tblgen --gen-capstone -I ./llvm-project/llvm/lib/Target/$ARCH  -I./llvm-project/build/include -I./llvm-project/llvm/include \
+  -I ./llvm-project/llvm/lib/Target -omit-comments --long-string-literals=0 -class=Instruction ./llvm-project/llvm/lib/Target/$ARCH/$ARCH.td \
+  > ./${ARCH}GenDisassemblerTables.inc
+```
 
-- Implemented in pure C language, with lightweight bindings for Swift, D, Clojure, F#,
-  Common Lisp, Visual Basic, PHP, PowerShell, Emacs, Haskell, Perl, Python,
-  Ruby, C#, NodeJS, Java, GO, C++, OCaml, Lua, Rust, Delphi, Free Pascal & Vala
-  ready either in main code, or provided externally by the community).
+5. Use the `sync/main.py` script from this repo. to generate a disassembler callback file
+```shell
+python ./sync/main.py ./llvm-project/llvm/lib/Target/$ARCH/Disassembler/${ARCH}Disassembler.cpp \
+  > ./Capstone${ARCH}Module.h
+```
 
-- Native support for all popular platforms: Windows, Mac OSX, iOS, Android,
-  Linux, \*BSD, Solaris, etc.
+6. Integrate the `Capstone${Arch}Module.h` with corresponding backends in capstone
 
-- Thread-safe by design.
+for more notes on integration see the `Note on Capstone{Arch}Module.h` chapter below
 
-- Special support for embedding into firmware or OS kernel.
+7. trunc the arch's disassembler and instruction printers to make it fit
 
-- High performance & suitable for malware analysis (capable of handling various
-  X86 malware tricks).
+this is a rather complicated step and highly depends on the original design of arch, the main idea
+is to make it best fit the table-gened file
 
-- Distributed under the open source BSD license.
+## How to sync with LLVM's update once the adaptation is done
 
-Further information is available at http://www.capstone-engine.org
+simple, just repeat the step `4` on the previous chapter and replace the `.inc` file with newly generated one
 
+## Note on Capstone{Arch}Module.h
 
-Compile
--------
+0. ARM & AArch64 from llvm uses feature bits on operand decoding, but capstone ignores them, e.g.
+```c++
+const FeatureBitset &featureBits =
+			  ((const MCDisassembler*)Decoder)->getSubtargetInfo().getFeatureBits();
 
-See COMPILE.TXT file for how to compile and install Capstone.
+bool hasMP = featureBits[ARM_FeatureMP];
+bool hasV7Ops = featureBits[ARM_HasV7Ops];
+```
+in capstone scene it would simply be
+```c
+bool hasMP = true;
+bool hasV7Ops = true;
+```
 
+1. The auto-sync python script does not performs well on template functions, so some manual override might be needed
 
-Documentation
--------------
+## Current adaptation progress:
 
-See docs/README for how to customize & program your own tools with Capstone.
-
-
-Hack
-----
-
-See HACK.TXT file for the structure of the source code.
-
-
-Fuzz
-----
-
-See suite/fuzz/README.md for more information.
-
-
-License
--------
-
-This project is released under the BSD license. If you redistribute the binary
-or source code of Capstone, please attach file LICENSE.TXT with your products.
+- [ ] All architectures
+    - [x] Mips
+    - [x] ARM
+    - [ ] AArch64
+    - [ ] Riscv
+    - [ ] PowerPC
+    - [ ] Sparc
+    - [ ] SystemZ
+    - [ ] TMS320C64x
+    - [ ] XCore
+- [x] Disassembler  
+- [x] Instruction Printer
+- [ ] Tests
+- [ ] Mapping Supports
+- [ ] Bindings Supports
