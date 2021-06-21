@@ -210,21 +210,7 @@ const char *Mips_reg_name(csh handle, unsigned int reg)
 #endif
 }
 // TODO needs refactor
-static const insn_map insns[] = {
-    // dummy item
-    {0,
-     0,
-#ifndef CAPSTONE_DIET
-     {0},
-     {0},
-     {0},
-     0,
-     0
-#endif
-    },
-
-    //#include "MipsMappingInsn.inc"
-};
+#include "MipsMapperInfo.inc"
 
 // given internal insn id, return public instruction info
 void Mips_get_insn_id(cs_struct *h, cs_insn *insn, unsigned int id)
@@ -314,10 +300,6 @@ static const name_map insn_name_maps[] = {
     {MIPS_INS_BBIT1, "bbit1"},
     {MIPS_INS_BBIT132, "bbit132"},
     {MIPS_INS_BC, "bc"},
-    {MIPS_INS_BC0F, "bc0f"},
-    {MIPS_INS_BC0FL, "bc0fl"},
-    {MIPS_INS_BC0T, "bc0t"},
-    {MIPS_INS_BC0TL, "bc0tl"},
     {MIPS_INS_BC1EQZ, "bc1eqz"},
     {MIPS_INS_BC1F, "bc1f"},
     {MIPS_INS_BC1FL, "bc1fl"},
@@ -325,15 +307,7 @@ static const name_map insn_name_maps[] = {
     {MIPS_INS_BC1T, "bc1t"},
     {MIPS_INS_BC1TL, "bc1tl"},
     {MIPS_INS_BC2EQZ, "bc2eqz"},
-    {MIPS_INS_BC2F, "bc2f"},
-    {MIPS_INS_BC2FL, "bc2fl"},
     {MIPS_INS_BC2NEZ, "bc2nez"},
-    {MIPS_INS_BC2T, "bc2t"},
-    {MIPS_INS_BC2TL, "bc2tl"},
-    {MIPS_INS_BC3F, "bc3f"},
-    {MIPS_INS_BC3FL, "bc3fl"},
-    {MIPS_INS_BC3T, "bc3t"},
-    {MIPS_INS_BC3TL, "bc3tl"},
     {MIPS_INS_BCLRI, "bclri"},
     {MIPS_INS_BCLR, "bclr"},
     {MIPS_INS_BEQ, "beq"},
@@ -888,9 +862,6 @@ static const name_map insn_name_maps[] = {
     // alias instructions
     {MIPS_INS_NOP, "nop"},
     {MIPS_INS_NEGU, "negu"},
-
-    {MIPS_INS_JALR_HB, "jalr.hb"},
-    {MIPS_INS_JR_HB, "jr.hb"},
 };
 
 const char *Mips_insn_name(csh handle, unsigned int id)
