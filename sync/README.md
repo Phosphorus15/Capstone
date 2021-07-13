@@ -69,15 +69,23 @@ bool hasV7Ops = true;
 - [ ] All architectures
     - [x] Mips
     - [x] ARM
-    - [ ] AArch64
-    - [ ] Riscv
-    - [ ] PowerPC
+    - [x] AArch64
+    - [x] Riscv
+    - [x] PowerPC
     - [ ] Sparc
     - [ ] SystemZ
     - [ ] TMS320C64x
     - [ ] XCore
+    - [ ] BPF
 - [x] Disassembler
 - [x] Instruction Printer
 - [ ] Tests
 - [ ] Mapping Supports
-- [ ] Bindings Supports
+    - [x] Mips
+- [ ] Binding Supports
+
+## Some points that might have to be fixed later
+
+- [ ] Feature bits
+- [ ] Suspicious namespace conflicts
+- [ ] PPC QPX ? PPC 64
