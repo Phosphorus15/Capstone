@@ -72,7 +72,7 @@ bool hasV7Ops = true;
     - [x] AArch64
     - [x] Riscv
     - [x] PowerPC
-    - [ ] Sparc
+    - [x] Sparc
     - [ ] SystemZ
     - [ ] TMS320C64x
     - [ ] XCore
