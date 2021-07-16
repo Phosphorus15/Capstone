@@ -73,10 +73,10 @@ bool hasV7Ops = true;
     - [x] Riscv
     - [x] PowerPC
     - [x] Sparc
-    - [ ] SystemZ
-    - [ ] TMS320C64x
-    - [ ] XCore
-    - [ ] BPF
+    - [x] SystemZ
+    - [ ] ~~TMS320C64x~~ (not supported by LLVM)
+    - [x] XCore
+    - [ ] ~~BPF~~ (structurally independent)
 - [x] Disassembler
 - [x] Instruction Printer
 - [ ] Tests
