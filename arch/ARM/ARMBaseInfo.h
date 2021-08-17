@@ -26,7 +26,7 @@
 // register name to register number.
 //
 #define GET_REGINFO_ENUM
-#include "ARMGenRegisterInfo.inc"
+#include "ARMGenDisassemblerTables.inc"
 
 // Enums corresponding to ARM condition codes
 // The CondCodes constants map directly to the 4-bit encoding of the
@@ -443,6 +443,8 @@ enum TraceSyncBOpt {
 	CSYNC = 0
 };
 
+enum ARMVCC { ARMVCC_None = 0, ARMVCC_Then, ARMVCC_Else };
+
 const MClassSysReg *lookupMClassSysRegByM2M3Encoding8(uint16_t encoding);
 const MClassSysReg *lookupMClassSysRegByM1Encoding12(uint16_t M1Encoding12);
 
@@ -451,6 +453,18 @@ const MClassSysReg *lookupMClassSysRegByM1Encoding12(uint16_t M1Encoding12);
 static inline const MClassSysReg *lookupMClassSysRegAPSRNonDeprecated(unsigned SYSm)
 {
 	return lookupMClassSysRegByM2M3Encoding8((1<<9) | (SYSm & 0xFF));
+}
+
+inline static const char *ARMVPTPredToString(unsigned CC) {
+  switch (CC) {
+  case ARMVCC_None:
+    return "none";
+  case ARMVCC_Then:
+    return "t";
+  case ARMVCC_Else:
+    return "e";
+  default:; // unreachable
+  }
 }
 
 static inline const MClassSysReg *lookupMClassSysRegBy8bitSYSmValue(unsigned SYSm)

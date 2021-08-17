@@ -31,14 +31,14 @@
 #include "ARMDisassembler.h"
 #include "ARMMapping.h"
 
-#define GET_SUBTARGETINFO_ENUM
-#include "ARMGenSubtargetInfo.inc"
+//#define GET_SUBTARGETINFO_ENUM
+//#include "ARMGenSubtargetInfo.inc"
 
 #define GET_INSTRINFO_MC_DESC
 #include "ARMGenInstrInfo.inc"
-
-#define GET_INSTRINFO_ENUM
-#include "ARMGenInstrInfo.inc"
+//
+//#define GET_INSTRINFO_ENUM
+//#include "ARMGenInstrInfo.inc"
 
 static bool ITStatus_push_back(ARM_ITStatus *it, char v)
 {
@@ -141,12 +141,13 @@ bool ARM_getFeatureBits(unsigned int mode, unsigned int feature)
 			feature == ARM_HasV8_4aOps || feature == ARM_HasV8_3aOps)
 			// HasV8MBaselineOps
 			return false;
-	} else {
-		if (feature == ARM_FeatureVFPOnlySP)
-			return false;
 	}
+        //        else {
+        //		if (feature == ARM_FeatureVFPOnlySP)
+        //			return false;
+        //	}
 
-	if ((mode & CS_MODE_MCLASS) == 0) {
+        if ((mode & CS_MODE_MCLASS) == 0) {
 		if (feature == ARM_FeatureMClass)
 			return false;
 	}
@@ -156,15 +157,16 @@ bool ARM_getFeatureBits(unsigned int mode, unsigned int feature)
 		if (feature == ARM_FeatureThumb2 || feature == ARM_ModeThumb)
 			return false;
 		// FIXME: what mode enables D16?
-		if (feature == ARM_FeatureD16)
-			return false;
-	} else {
-		// Thumb
-		if (feature == ARM_FeatureD16)
-			return false;
-	}
+                //		if (feature == ARM_FeatureD16)
+                //			return false;
+        }
+        //        else {
+        //		// Thumb
+        //		if (feature == ARM_FeatureD16)
+        //			return false;
+        //	}
 
-	if (feature == ARM_FeatureMClass && (mode & CS_MODE_MCLASS) == 0)
+        if (feature == ARM_FeatureMClass && (mode & CS_MODE_MCLASS) == 0)
 		return false;
 
 	// we support everything
@@ -190,8 +192,8 @@ static DecodeStatus DecodePredicateOperand(MCInst *Inst, unsigned Val,
 	return MCDisassembler_Success;
 }
 
-#define GET_REGINFO_MC_DESC
-#include "ARMGenRegisterInfo.inc"
+//#define GET_REGINFO_MC_DESC
+//#include "ARMGenRegisterInfo.inc"
 void ARM_init(MCRegisterInfo *MRI)
 {
 	/* 
