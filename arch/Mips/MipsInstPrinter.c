@@ -33,6 +33,10 @@
 static void printUnsignedImm(MCInst *MI, int opNum, SStream *O);
 static char *printAliasInstr(MCInst *MI, SStream *O);
 static char *printAlias(MCInst *MI, SStream *OS);
+static void printCustomAliasOperand(
+    const MCInst *MI, unsigned OpIdx,
+    unsigned PrintMethodIdx,
+    SStream *OS);
 
 // These enumeration declarations were originally in MipsInstrInfo.h but
 // had to be moved here to avoid circular dependencies between
