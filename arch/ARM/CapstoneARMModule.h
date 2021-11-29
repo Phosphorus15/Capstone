@@ -94,11 +94,11 @@ static DecodeStatus DecodeMQPRRegisterClass(MCInst *Inst, unsigned RegNo,
 					    uint64_t Address,
 					    MCRegisterInfo *Decoder);
 
-static DecodeStatus DecodeQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
+static DecodeStatus DecodeMQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
 					    uint64_t Address,
 					    MCRegisterInfo *Decoder);
 
-static DecodeStatus DecodeQQQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
+static DecodeStatus DecodeMQQQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
 					      uint64_t Address,
 					      MCRegisterInfo *Decoder);
 
@@ -5966,7 +5966,7 @@ static const uint16_t QQPRDecoderTable[] = {ARM_Q0_Q1, ARM_Q1_Q2, ARM_Q2_Q3,
 					    ARM_Q3_Q4, ARM_Q4_Q5, ARM_Q5_Q6,
 					    ARM_Q6_Q7};
 
-static DecodeStatus DecodeQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
+static DecodeStatus DecodeMQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
 					    uint64_t Address,
 					    MCRegisterInfo *Decoder)
 {
@@ -5982,7 +5982,7 @@ static const uint16_t QQQQPRDecoderTable[] = {ARM_Q0_Q1_Q2_Q3, ARM_Q1_Q2_Q3_Q4,
 					      ARM_Q2_Q3_Q4_Q5, ARM_Q3_Q4_Q5_Q6,
 					      ARM_Q4_Q5_Q6_Q7};
 
-static DecodeStatus DecodeQQQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
+static DecodeStatus DecodeMQQQQPRRegisterClass(MCInst *Inst, unsigned RegNo,
 					      uint64_t Address,
 					      MCRegisterInfo *Decoder)
 {
