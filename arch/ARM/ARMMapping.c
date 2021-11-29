@@ -255,7 +255,7 @@ const char *ARM_reg_name(csh handle, unsigned int reg)
         }
 
         // invalid
-	return NULL;
+	return "invalid";
 #else
 	return NULL;
 #endif

@@ -363,6 +363,7 @@ static void printRegImmShift(MCInst *MI, SStream *O, ARM_AM_ShiftOpc ShOpc, unsi
 
 static void printRegName(cs_struct *h, SStream *OS, unsigned RegNo) {
 #ifndef CAPSTONE_DIET
+  if(RegNo == 0) return;
     SStream_concat0(OS, h->get_regname(RegNo));
 #endif
 }
